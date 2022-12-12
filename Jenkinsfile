@@ -10,11 +10,13 @@ pipeline {
         		SERVER_CREDENTIALS =credentials('server-credentials')
         	}
             steps {
+/*            
             	 when {
             	 	expression {
             	 		BRANCH_NAME == 'dev' || BRANCH_NAME == 'master' 
             	 	}
             	 }
+*/            	 
 			     script {
 					echo 'Building the application'
 					echo "Building version ${NEW_VERSION}" 
