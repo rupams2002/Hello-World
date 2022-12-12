@@ -1,8 +1,6 @@
 pipeline {
 	
-    agent {
-        label 'Mohammed Agent'
-    }
+    agent any
 	
 	stages {
 
