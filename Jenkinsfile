@@ -1,6 +1,6 @@
 pipeline {
 	
-     agent {
+    agent {
         label 'Mohammed's Agent'
     }
 	
