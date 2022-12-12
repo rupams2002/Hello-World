@@ -1,6 +1,9 @@
 pipeline {
 	
     agent any
+	tools{
+		maven 'Maven'	
+	}	
 	
 	stages {
 
@@ -8,6 +11,7 @@ pipeline {
         	environment{
         		NEW_VERSION = '1.3.0'
         		SERVER_CREDENTIALS =credentials('server-credentials')
+        		sh "mvn -version"
         	}
             steps {
 /*            
