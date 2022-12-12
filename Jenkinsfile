@@ -5,10 +5,19 @@ pipeline {
 	stages {
 
         stage('build') {
-
+        	environment{
+        		NEW_VERSION = '1.3.0'
+        		SERVER_CREDENTIALS =credentials('server-credentials')
+        	}
             steps {
+            	 when {
+            	 	expression {
+            	 		BRANCH_NAME == 'dev' || BRANCH_NAME == 'master' 
+            	 	}
+            	 }
 			     script {
 					echo 'Building the application'
+					echo "Building version ${NEW_VERSION}" 
                 }
             }
         }
@@ -27,8 +36,26 @@ pipeline {
             steps {
 			     script {
 					echo 'Deploying the application'
+					echo "Deploying with ${SERVER_CREDENTIALS}"
+					//sh "${SERVER_CREDENTIALS}"
+
+					withCredentials([ usernamePassword(credentials: 'server-credentials', usernameVariable: USER, passwordVariable: PWD)]){
+						sh "Some script ${USER} ${PWD}"											
+					}
                 }
             }
+        }
+        
+        post {
+        	always {
+        		//	
+        	}
+        	success {
+        		//	
+        	}        
+        	failure {
+        		//	
+        	}        
         }     
 	 
 	}
