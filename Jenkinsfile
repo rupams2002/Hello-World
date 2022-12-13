@@ -24,6 +24,8 @@ pipeline {
 			     script {
 					echo 'Building the application'
 					echo "Building version ${NEW_VERSION}" 
+					
+					docker --version 
                 }
             }
         }
