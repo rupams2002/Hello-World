@@ -14,6 +14,7 @@ pipeline {
 					sh 'docker --version'						
 					sh 'docker compose --version'						
 					sh 'docker compose ps'						
+        		    sh 'mvn -version'
 				}
 			}
         }
@@ -23,7 +24,7 @@ pipeline {
         	environment{
         		NEW_VERSION = '1.3.0'
         		//SERVER_CREDENTIALS = credentials('My-Git-Token')
-        		//sh "mvn -version"
+        		//sh 'mvn -version'
         	}
             steps {
 /*            
