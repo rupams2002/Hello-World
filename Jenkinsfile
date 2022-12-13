@@ -42,7 +42,7 @@ pipeline {
             steps {
 			     script {
 					echo 'Deploying the application'
-					echo "Deploying with ${SERVER_CREDENTIALS}"
+					//echo "Deploying with ${SERVER_CREDENTIALS}"
 					//sh "${SERVER_CREDENTIALS}"
 
 					withCredentials([ usernamePassword(credentials: 'server-credentials', usernameVariable: USER, passwordVariable: PWD)]){
