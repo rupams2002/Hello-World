@@ -11,6 +11,7 @@ pipeline {
             steps {
 				script{
 					sh 'java -version'						
+					sh 'docker --version'						
 				}
 			}
         }
