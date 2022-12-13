@@ -12,8 +12,7 @@ pipeline {
 				script{
 					sh 'java -version'						
 					sh 'docker --version'						
-					sh 'sudo docker --info'						
-					sh 'sudo docker compose --version'						
+					sh 'docker compose --version'						
 				}
 			}
         }
