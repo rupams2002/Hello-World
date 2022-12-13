@@ -10,7 +10,7 @@ pipeline {
         stage('build') {
         	environment{
         		NEW_VERSION = '1.3.0'
-        		SERVER_CREDENTIALS = credentials('server-credentials')
+        		SERVER_CREDENTIALS = credentials('My-Git-Token')
         		//sh "mvn -version"
         	}
             steps {
