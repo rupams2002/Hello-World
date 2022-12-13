@@ -10,8 +10,8 @@ pipeline {
         stage('build') {
         	environment{
         		NEW_VERSION = '1.3.0'
-        		SERVER_CREDENTIALS =credentials('server-credentials')
-        		sh "mvn -version"
+        		SERVER_CREDENTIALS = credentials('server-credentials')
+        		//sh "mvn -version"
         	}
             steps {
 /*            
@@ -46,7 +46,7 @@ pipeline {
 					//sh "${SERVER_CREDENTIALS}"
 
 					withCredentials([ usernamePassword(credentials: 'server-credentials', usernameVariable: USER, passwordVariable: PWD)]){
-						sh "Some script ${USER} ${PWD}"											
+						//sh "Some script ${USER} ${PWD}"											
 					}
                 }
             }
