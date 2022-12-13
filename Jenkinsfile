@@ -7,6 +7,15 @@ pipeline {
 	
 	stages {
 
+        stage('init') {
+            steps {
+				script{
+					sh 'java -version'						
+				}
+			}
+        }
+
+
         stage('build') {
         	environment{
         		NEW_VERSION = '1.3.0'
@@ -24,8 +33,6 @@ pipeline {
 			     script {
 					echo 'Building the application'
 					echo "Building version ${NEW_VERSION}" 
-					
-					docker --version 
                 }
             }
         }
