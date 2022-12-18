@@ -8,6 +8,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
+	<!--HELLO WORLD PROJECT-->
 	<groupId>com.myproject</groupId>
 	<artifactId>helloworld</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
