@@ -3,6 +3,7 @@ version: "2.1"
 services: 
     ##Container providing a local MSSQL db instance
     dba1:
+        container_name: 'mssql-db'
         image: mcr.microsoft.com/mssql/server:2017-latest
         ports:
             - 1433:1433
