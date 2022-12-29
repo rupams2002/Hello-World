@@ -1,14 +1,14 @@
-version: "3.8"
+version: "2.1"
 
 services: 
     ##Container providing a local MSSQL db instance
-    svr003:
+    dba1:
+        image: mcr.microsoft.com/mssql/server:2017-latest
+        ports:
+            - 1433:1433
         environment:
             ACCEPT_EULA: "Y"
             SA_PASSWORD: Qwe12312
-        image: solar/base/mssql_server_2017/local
-        ports:
-            - 1433:1433
         volumes:
             - mssqlserver_volume:/var/opt/mssql 
 volumes:
