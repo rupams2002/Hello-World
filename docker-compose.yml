@@ -13,6 +13,7 @@ services:
         volumes:
             - mssql-server-linux-data:/var/opt/mssql/data
             - mssql-server-linux-data:/var/opt/mssql/log
+            - mssql-server-linux-data:/var/opt/mssql/secret
 
 volumes:
   mssql-server-linux-data:
