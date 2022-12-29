@@ -1,8 +1,8 @@
-version: "2.1"
+version: "3.4"
 
 services: 
     ##Container providing a local MSSQL db instance
-    dba1:
+    sqlserver:
         container_name: 'mssql-db'
         image: mcr.microsoft.com/mssql/server:2017-latest
         ports:
@@ -11,6 +11,9 @@ services:
             ACCEPT_EULA: "Y"
             SA_PASSWORD: Qwe12312
         volumes:
-            - sqlsystem:/var/opt/mssql/data
-            - sqluser:/var/opt/mssql/sqlserver
-            - sqlbackups:/var/opt/mssql/backups
+            - mssql-server-linux-data:/var/opt/mssql/data
+            - mssql-server-linux-data:/var/opt/mssql/log
+
+volumes:
+  mssql-server-linux-data:
+ 
