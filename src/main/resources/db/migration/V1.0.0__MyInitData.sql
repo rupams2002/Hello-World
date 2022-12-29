@@ -1,0 +1,16 @@
+USE [cntr_sassc]
+GO
+
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[V_APPLICATION](
+	[APP_ID] [bigint] NULL,
+	[APP_NAME] [varchar](50) NULL,
+	[DATE] [timestamp] NULL
+) ON [PRIMARY]
+GO
+
