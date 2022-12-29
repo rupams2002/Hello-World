@@ -11,7 +11,6 @@ services:
             ACCEPT_EULA: "Y"
             SA_PASSWORD: Qwe12312
         volumes:
-            - mssqlserver_volume:/var/opt/mssql 
-volumes:
-    mssqlserver_volume:
-    
+            - sqlsystem:/var/opt/mssql/data
+            - sqluser:/var/opt/mssql/sqlserver
+            - sqlbackups:/var/opt/mssql/backups
