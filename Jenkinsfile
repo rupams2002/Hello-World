@@ -11,9 +11,9 @@ pipeline {
         stage('init') {
             steps {
 				script{
-					sh 'java -version'						
-					sh 'docker --version'						
-					sh 'docker compose --version'						
+					sh 'java -version'
+					sh 'docker --version'
+					sh 'docker compose version'
 	       		    sh 'mvn -version'
 				}
 			}
@@ -41,6 +41,9 @@ pipeline {
                       sh "pwd"
   					  sh 'mvn clean package'
 
+					  sh 'docker container prune -f' //remove any stopped containers
+  					  sh 'docker system prune -a -f' //remove any stopped containers and all unused images
+                      //sh 'kill -9 `sudo lsof -t -i:9001`'
   					  
   					  sh 'docker rm -f $(docker ps -q) || true'
   					  sh 'docker build -t rupams2002/hello-world:1.0-SNAPSHOT .'
@@ -56,14 +59,17 @@ pipeline {
   					  //sh 'docker tag mohammed/hello-world:1.0-SNAPSHOT rupams2002/hello-world:1.0-SNAPSHOT'  // If image and tag is different then match tag with docker hub. in my case rupams2002/xxxxxxxxx
   					  sh 'docker push rupams2002/hello-world:1.0-SNAPSHOT'
   					  
-					  sh 'docker container prune -f' //remove any stopped containers
-  					  sh 'docker system prune -a -f' //remove any stopped containers and all unused images
+  					  
+                      sh 'docker compose up -d'
+                      sh 'docker compose ps'
+                      
+                      
+  					  //sh 'mvn com.microsoft.azure:azure-spring-cloud-maven-plugin:1.3.0:config'
                     }					
                 }
             }
         }
         
-        
- 
+
 	}
 }
