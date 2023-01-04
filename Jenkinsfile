@@ -39,7 +39,8 @@ pipeline {
 					
                     dir("${env.WORKSPACE}/Hello-World"){
                       sh "pwd"
-  					  sh 'mvn clean package'
+  					  //sh 'mvn clean package'
+  					  sh 'mvn clean flyway:migrate -Dflyway.configFiles=flyway.conf package'
 
 					  sh 'docker container prune -f' //remove any stopped containers
   					  sh 'docker system prune -a -f' //remove any stopped containers and all unused images
