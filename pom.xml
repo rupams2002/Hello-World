@@ -88,21 +88,22 @@
 			  <version>3.7.0.1746</version>
 			</plugin>
 			
-	        <plugin>
+			
+			<plugin>
 				<groupId>com.spotify</groupId>
 				<artifactId>docker-maven-plugin</artifactId>
-				<version>0.4.11</version>
+				<version>1.2.0</version>
 				<configuration>
-					<imageName>gcr.io/{image_name}</imageName>
-					<dockerDirectory>${project.basedir}/src/main/docker</dockerDirectory>
+					<imageName>${project.artifactId}:${project.version}</imageName>
+					<dockerDirectory>${project.basedir}</dockerDirectory>
 					<resources>
 						<resource>
 							<targetPath>/</targetPath>
 							<directory>${project.build.directory}</directory>
-							<include>${project.artifactId}.jar</include>
+							<include>${project.build.finalName}.jar</include>
 						</resource>
 					</resources>
-				</configuration>	
+				</configuration>
 			</plugin>			
 			
 			
