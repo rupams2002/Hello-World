@@ -1,0 +1,53 @@
+pipeline {
+    
+    agent { label 'vm-dtb-aid-sg2-dv-sg2' }
+
+    //environment{
+        //dockerhub = credentials('Docker-Hub')
+    //}    
+
+	stages {
+
+        stage('Check Environment Versions VM-1') {
+            steps {
+               
+				script{        
+					echo '********* Pull Hello World From Docker Hub *********'
+					
+                    if( fileExists ("${env.WORKSPACE}/Hello-World") ){
+					  sh 'rm -R *'
+                      sh "pwd"
+                      sh 'sudo chown $USERS:users /run/docker.sock'
+                    }
+
+
+                    sh 'sudo docker container prune -f' //remove any stopped containers
+                    sh 'sudo docker system prune -a -f' //remove any stopped containers and all unused images
+                    //sh 'kill -9 `sudo lsof -t -i:9001`'
+                    sh 'sudo docker rm -f $(sudo docker ps -q) || true'
+
+                    withCredentials([string(credentialsId: 'DockerHub-PWD-SecretText', variable: 'dockerhubpwd')]) {
+                    	  //sh 'sudo docker login -u $dockerhub_USR -p ${dockerhubpwd}'
+                        sh 'sudo docker login -u rupams2002 -p ${dockerhubpwd}'
+                    }
+                    
+                    sh 'sudo docker pull rupams2002/hello-world:1.0-SNAPSHOT'
+                    sh 'sudo docker run -d -p 9001:9001 --name helloworld  rupams2002/hello-world:1.0-SNAPSHOT'
+                    
+                    
+                    
+					echo '**** Start Git Clone ****'
+					sh 'git clone https://github.com/rupams2002/Hello-World.git'
+                    
+                    dir("${env.WORKSPACE}/Hello-World"){
+                        sh 'sudo docker compose up -d'
+                    }                    
+                    
+ 				}
+			}
+        }
+
+
+	}
+
+}
