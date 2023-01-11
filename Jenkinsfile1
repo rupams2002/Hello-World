@@ -48,6 +48,7 @@ pipeline {
                     dir("${env.WORKSPACE}/Hello-World"){
                       sh "pwd"
   					  sh 'mvn clean package'
+  					  //sh 'mvn clean package docker:build'
   					  //sh 'mvn clean flyway:migrate -Dflyway.configFiles=flyway.conf package'
 
 					  sh 'sudo docker container prune -f' //remove any stopped containers
@@ -55,9 +56,11 @@ pipeline {
                       //sh 'kill -9 `sudo lsof -t -i:9001`'
   					  
   					  sh 'sudo docker rm -f $(sudo docker ps -q) || true'
-  					  sh 'sudo docker build -t rupams2002/hello-world:1.0-SNAPSHOT .'
-    				  //sh 'sudo docker run -d -p 9001:9001 --name helloworld  rupams2002/hello-world:1.0-SNAPSHOT'
 
+                      //Docker build create image from 'Dockerfile'    
+  					  sh 'sudo docker build -t rupams2002/hello-world:1.0-SNAPSHOT .'
+
+    				  sh 'sudo docker run -d -p 9001:9001 --name helloworld  rupams2002/hello-world:1.0-SNAPSHOT'
 
                       withCredentials([string(credentialsId: 'DockerHub-PWD-SecretText', variable: 'dockerhubpwd')]) {
       				  	  //sh 'sudo docker login -u $dockerhub_USR -p ${dockerhubpwd}'
@@ -65,13 +68,29 @@ pipeline {
                       }
                       
   					  //sh 'docker tag mohammed/hello-world:1.0-SNAPSHOT rupams2002/hello-world:1.0-SNAPSHOT'  // If image and tag is different then match tag with docker hub. in my case rupams2002/xxxxxxxxx
-  					  sh 'sudo docker push rupams2002/hello-world:1.0-SNAPSHOT'
+  					  //sh 'sudo docker push rupams2002/hello-world:1.0-SNAPSHOT'
 
   					  //sh 'mvn com.microsoft.azure:azure-spring-cloud-maven-plugin:1.3.0:config'
                     }					
                 }
             }
         }
+
+
+        stage('Trigger Job HelloWorld-DockerHub-Pull') {
+            steps {
+                build 'HelloWorld-DockerHub-Pull'
+            }
+        }
+        
+
+        stage('After Job HelloWorld-DockerHub-Pull') {
+            steps {
+                echo 'Back after Job : HelloWorld-DockerHub-Pull'
+            }
+        }
+
+
          
 /*        
         stage('Create MS SQL') {
