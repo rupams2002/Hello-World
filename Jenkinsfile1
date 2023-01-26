@@ -1,53 +1,40 @@
 pipeline {
-    
-    //agent none
-    //agent any
-    agent { label 'vm-dtb-aid-sg2-dv-sg2dops' }
-
+    agent any
     //agent { docker { image 'node:16-alpine' } }
 
-    //environment{
-        //dockerhub = credentials('Docker-Hub')
-    //}    
+    environment{
+        //String IMAGE_NAME = 'rupams2002/hello-world';
+        String IMAGE_NAME = 'hc-sc-playground/hello-world';
+        
+        String TAG = '0.0.7-SNAPSHOT';
+        //String TAG = 'latest';
+    }
 
 	stages {
 
-        stage('Check Environment Versions VM-2') {
-            steps {
-                //agent { label 'vm-dtb-aid-sg2-dv-sg2dops' }
 
-				script{
-					echo '********* Checking Versions *********'
-					sh 'java -version'
-					sh 'docker --version'
-					sh 'docker compose version'
-	       		    sh 'mvn -version'
-				}
-			}
-        }
-        
-        stage('Start Build') {
+        stage('Start Checkout') {
+            agent { 
+                label 'vm-dtb-aid-sg2-dv-sg2dops' 
+            }
             steps {
 			    script {
-                    //agent { label 'vm-dtb-aid-sg2-dv-sg2dops' }
-                    
 					echo '********* Start Building Project *********'
-					sh 'whoami'
 
-                    if( fileExists ("${env.WORKSPACE}/Hello-World")  ){
-					  sh 'rm -R *'
-                      sh "pwd"
-                      sh 'sudo chown $USERS:users /run/docker.sock'
-                    }
+                    // Clean before build
+                    cleanWs()
+                    sh 'sudo chown $USERS:users /run/docker.sock'
 
 
 					echo '**** Start Git Clone ****'
-					sh 'git clone https://github.com/rupams2002/Hello-World.git'
-					//sh 'git branch'
-					
-                    dir("${env.WORKSPACE}/Hello-World"){
+                    withCredentials([string(credentialsId: 'MyGitHubCredential', variable: 'MyGitHubCredential')]) {
+    					sh 'git clone https://${MyGitHubCredential}:${MyGitHubCredential}@github.com/hc-sc-playground/tempHelloWorld.git'
+                    }    
+
+                    //dir("${env.WORKSPACE}/Hello-World"){
+                    dir("${env.WORKSPACE}/tempHelloWorld"){
                       sh "pwd"
-  					  sh 'mvn clean package'
+  					  //sh 'mvn clean package'
   					  //sh 'mvn clean package docker:build'
   					  //sh 'mvn clean flyway:migrate -Dflyway.configFiles=flyway.conf package'
 
@@ -58,37 +45,91 @@ pipeline {
   					  sh 'sudo docker rm -f $(sudo docker ps -q) || true'
 
                       //Docker build create image from 'Dockerfile'    
-  					  sh 'sudo docker build -t rupams2002/hello-world:1.0-SNAPSHOT .'
+  					  sh 'sudo docker build -t ghcr.io/$IMAGE_NAME:$TAG .'
 
-    				  sh 'sudo docker run -d -p 9001:9001 --name helloworld  rupams2002/hello-world:1.0-SNAPSHOT'
-
-                      withCredentials([string(credentialsId: 'DockerHub-PWD-SecretText', variable: 'dockerhubpwd')]) {
-      				  	  //sh 'sudo docker login -u $dockerhub_USR -p ${dockerhubpwd}'
-      					  sh 'sudo docker login -u rupams2002 -p ${dockerhubpwd}'
-                      }
-                      
-  					  //sh 'docker tag mohammed/hello-world:1.0-SNAPSHOT rupams2002/hello-world:1.0-SNAPSHOT'  // If image and tag is different then match tag with docker hub. in my case rupams2002/xxxxxxxxx
-  					  //sh 'sudo docker push rupams2002/hello-world:1.0-SNAPSHOT'
-
-  					  //sh 'mvn com.microsoft.azure:azure-spring-cloud-maven-plugin:1.3.0:config'
+    				  //sh 'sudo docker run -d -p 9001:9001 --name helloworld  rupams2002/hello-world:1.2-SNAPSHOT'
                     }					
                 }
             }
         }
+        
+        
+        stage('Push GitHub Container Registry') {
+            agent { 
+                label 'vm-dtb-aid-sg2-dv-sg2dops'
+            }
+            steps {
+			    script {
+                    //dir("${env.WORKSPACE}/Hello-World"){
+                    dir("${env.WORKSPACE}/tempHelloWorld"){
+                     
+                        withCredentials([string(credentialsId: 'MyGitHubCredential', variable: 'MyGitHubCredential')]) {
+    					   sh 'sudo docker login ghcr.io -u rupams2002 --password ${MyGitHubCredential}'
+    					   sh 'sudo docker push ghcr.io/$IMAGE_NAME:$TAG'
+                        }
+
+//                        withCredentials([usernamePassword(credentialsId: 'MyGitHubCredential', usernameVariable: 'USERNAME', passwordVariable: 'MyGitHubCredential')]) {
+//    					   sh 'sudo docker login ghcr.io -u ${USERNAME} --password ${MyGitHubCredential}'
+//    					   sh 'sudo docker push ghcr.io/$IMAGE_NAME:$TAG'
+//                        }
+
+                    }
+                }
+            }
+        }
+    
 
 
+        stage('Start Container VM-1') {
+            agent { 
+                label 'vm-dtb-aid-sg2-dv-sg2' 
+            }
+
+            steps {
+				script{        
+					echo '********* Pull Hello World From Docker Hub *********'
+					
+                    //if( fileExists ("${env.WORKSPACE}/Hello-World") ){
+                    if( fileExists ("${env.WORKSPACE}/tempHelloWorld") ){
+					  sh 'rm -R *'
+                      sh "pwd"
+                      sh 'sudo chown $USERS:users /run/docker.sock'
+                    }
+
+
+                    sh 'sudo docker container prune -f' //remove any stopped containers
+                    sh 'sudo docker system prune -a -f' //remove any stopped containers and all unused images
+                    sh 'sudo docker rm -f $(sudo docker ps -q) || true'
+                    
+
+                    withCredentials([string(credentialsId: 'MyGitHubCredential', variable: 'MyGitHubCredential')]) {
+					   sh 'sudo docker login ghcr.io -u rupams2002 --password ${MyGitHubCredential}'
+					   
+					   sh 'sudo docker pull ghcr.io/$IMAGE_NAME:$TAG'
+                    }
+
+                    //sh 'sudo kill -9 `sudo lsof -t -i:9001`'
+                    sh 'sudo docker run -d -p 80:8080 --name helloworld  ghcr.io/$IMAGE_NAME:$TAG'
+ 				}
+			}
+        }
+
+
+
+//IF YOU NEED TO CALL ANOTHER PIPELINEFRON THIS PIPELINE
+/*
         stage('Trigger Job HelloWorld-DockerHub-Pull') {
             steps {
                 build 'HelloWorld-DockerHub-Pull'
             }
         }
         
-
         stage('After Job HelloWorld-DockerHub-Pull') {
             steps {
                 echo 'Back after Job : HelloWorld-DockerHub-Pull'
             }
         }
+*/
 
 
          
@@ -115,5 +156,4 @@ pipeline {
 
 	}
 
-	
 }
