@@ -11,7 +11,7 @@ public class HelloWorld {
 
 	@GetMapping("/")
 	public String helloWorld() {
-		return "<b>Hello World Version 6 (ISSUE-01 Branch)</b>";		 
+		return "<b>Hello World Version 7</b>";		 
 	}
 	
 }
